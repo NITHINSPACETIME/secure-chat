@@ -1,4 +1,3 @@
-
 import {
   collection,
   doc,
@@ -60,7 +59,7 @@ const cleanup = () => {
   callId = null;
 
   if (setCallState) {
-    setCallState({
+    setCallState?.({
       status: "idle",
       partnerId: null,
       partnerName: null,
@@ -71,7 +70,7 @@ const cleanup = () => {
       errorMessage: undefined,
       callStartTime: undefined,
       connectionStatus: "new",
-      callType: 'video'
+      callType: "video",
     });
   }
 };
@@ -89,7 +88,7 @@ const initializePeerConnection = () => {
       event.streams[0] || new MediaStream([event.track]);
 
     if (setCallState) {
-      setCallState((prev) => ({
+      setCallState?.((prev) => ({
         ...prev,
         remoteStream: remoteMediaStream,
       }));
@@ -98,19 +97,19 @@ const initializePeerConnection = () => {
 
   peerConnection.oniceconnectionstatechange = () => {
     const state = peerConnection?.iceConnectionState || "closed";
-    
+
     if (setCallState) {
-      setCallState((prev) => ({ ...prev, connectionStatus: state }));
+      setCallState?.((prev) => ({ ...prev, connectionStatus: state }));
 
       if (state === "failed") {
-        setCallState((prev) => ({
+        setCallState?.((prev) => ({
           ...prev,
           status: "error",
           errorMessage:
             "Connection failed. The network link could not be established.",
         }));
       } else if (state === "closed") {
-         cleanup();
+        cleanup();
       }
     }
   };
@@ -127,9 +126,9 @@ export const callManager = {
     blockedUsers = _blockedUsers;
     callManager.listenForIncomingCalls();
   },
-  
+
   updateBlockedUsers: (newBlocked: string[]) => {
-      blockedUsers = newBlocked;
+    blockedUsers = newBlocked;
   },
 
   listenForIncomingCalls: () => {
@@ -141,17 +140,17 @@ export const callManager = {
       snapshot.docChanges().forEach(async (change) => {
         if (change.type === "added") {
           const callData = change.doc.data();
-          
+
           // Block Check
           if (blockedUsers.includes(callData.callerId)) {
-             // Silently ignore/reject
-             return; 
+            // Silently ignore/reject
+            return;
           }
 
           if (setCallState && !callId) {
             const userSnap = await getDoc(doc(db, "users", callData.callerId));
             callId = change.doc.id;
-            setCallState((prev) => ({
+            setCallState?.((prev) => ({
               ...prev,
               status: "incoming",
               partnerId: callData.callerId,
@@ -159,12 +158,12 @@ export const callManager = {
                 ? userSnap.data().name
                 : "Unknown Caller",
               connectionStatus: "new",
-              callType: callData.callType || 'video'
+              callType: callData.callType || "video",
             }));
           }
         }
         if (change.type === "removed" && change.doc.id === callId) {
-            cleanup();
+          cleanup();
         }
       });
     });
@@ -176,16 +175,20 @@ export const callManager = {
     isVideo: boolean
   ) => {
     if (!myId || !setCallState) return;
-    
+
     if (blockedUsers.includes(partnerId)) {
-        setCallState(prev => ({ ...prev, status: "error", errorMessage: "Cannot call blocked user." }));
-        return;
+      setCallState?.((prev) => ({
+        ...prev,
+        status: "error",
+        errorMessage: "Cannot call blocked user.",
+      }));
+      return;
     }
 
     if (callId) await callManager.hangUp();
 
     callId = doc(collection(db, "calls")).id;
-    const callType = isVideo ? 'video' : 'audio';
+    const callType = isVideo ? "video" : "audio";
 
     try {
       initializePeerConnection();
@@ -199,7 +202,7 @@ export const callManager = {
         peerConnection?.addTrack(track, localStreamRef!);
       });
 
-      setCallState((prev) => ({
+      setCallState?.((prev) => ({
         ...prev,
         localStream: localStreamRef,
         status: "outgoing",
@@ -207,10 +210,15 @@ export const callManager = {
         partnerName,
         isVideoOff: !isVideo,
         connectionStatus: "new",
-        callType
+        callType,
       }));
 
-      const candidatesCollection = collection(db, "calls", callId!, "callerCandidates");
+      const candidatesCollection = collection(
+        db,
+        "calls",
+        callId!,
+        "callerCandidates"
+      );
       peerConnection!.onicecandidate = (event) => {
         if (event.candidate) {
           addDoc(candidatesCollection, event.candidate.toJSON());
@@ -229,31 +237,38 @@ export const callManager = {
         callerId: myId,
         calleeId: partnerId,
         offer,
-        callType
+        callType,
       });
 
-      activeCallListener = onSnapshot(doc(db, "calls", callId!), async (docSnapshot) => {
-        if (!docSnapshot.exists()) {
+      activeCallListener = onSnapshot(
+        doc(db, "calls", callId!),
+        async (docSnapshot) => {
+          if (!docSnapshot.exists()) {
             cleanup();
             return;
-        }
-        const data = docSnapshot.data();
-        if (data?.status === 'rejected') {
-            setCallState(prev => ({...prev, status: 'error', errorMessage: "Call Declined" }));
+          }
+          const data = docSnapshot.data();
+          if (data?.status === "rejected") {
+            setCallState?.((prev) => ({
+              ...prev,
+              status: "error",
+              errorMessage: "Call Declined",
+            }));
             setTimeout(cleanup, 2000);
             return;
-        }
+          }
 
-        if (!peerConnection?.currentRemoteDescription && data?.answer) {
-          const answerDescription = new RTCSessionDescription(data.answer);
-          await peerConnection?.setRemoteDescription(answerDescription);
-          setCallState((prev) => ({
-            ...prev,
-            status: "connected",
-            callStartTime: Date.now(),
-          }));
+          if (!peerConnection?.currentRemoteDescription && data?.answer) {
+            const answerDescription = new RTCSessionDescription(data.answer);
+            await peerConnection?.setRemoteDescription(answerDescription);
+            setCallState?.((prev) => ({
+              ...prev,
+              status: "connected",
+              callStartTime: Date.now(),
+            }));
+          }
         }
-      });
+      );
 
       candidateListener = onSnapshot(
         collection(db, "calls", callId!, "answerCandidates"),
@@ -268,7 +283,7 @@ export const callManager = {
       );
     } catch (err: any) {
       console.error("Error starting call:", err);
-      setCallState((prev) => ({
+      setCallState?.((prev) => ({
         ...prev,
         status: "error",
         errorMessage: "Failed to access media devices.",
@@ -281,10 +296,10 @@ export const callManager = {
 
     try {
       initializePeerConnection();
-      
+
       // If accepting audio call, ensure we don't ask for video even if 'isVideo' arg is passed true accidentally
       // (Though UI should control this)
-      
+
       localStreamRef = await navigator.mediaDevices.getUserMedia({
         video: isVideo,
         audio: true,
@@ -293,7 +308,7 @@ export const callManager = {
         peerConnection?.addTrack(track, localStreamRef!);
       });
 
-      setCallState((prev) => ({
+      setCallState?.((prev) => ({
         ...prev,
         localStream: localStreamRef,
         isVideoOff: !isVideo,
@@ -305,14 +320,21 @@ export const callManager = {
 
       if (!callData) throw new Error("Call data not found");
 
-      const candidatesCollection = collection(db, "calls", callId, "answerCandidates");
+      const candidatesCollection = collection(
+        db,
+        "calls",
+        callId,
+        "answerCandidates"
+      );
       peerConnection!.onicecandidate = (event) => {
         if (event.candidate) {
           addDoc(candidatesCollection, event.candidate.toJSON());
         }
       };
 
-      await peerConnection?.setRemoteDescription(new RTCSessionDescription(callData.offer));
+      await peerConnection?.setRemoteDescription(
+        new RTCSessionDescription(callData.offer)
+      );
       const answerDescription = await peerConnection!.createAnswer();
       await peerConnection!.setLocalDescription(answerDescription);
 
@@ -322,7 +344,7 @@ export const callManager = {
       };
 
       await updateDoc(callDocRef, { answer });
-      setCallState((prev) => ({
+      setCallState?.((prev) => ({
         ...prev,
         status: "connected",
         callStartTime: Date.now(),
@@ -339,16 +361,15 @@ export const callManager = {
           });
         }
       );
-      
-      activeCallListener = onSnapshot(callDocRef, (docSnapshot) => {
-          if (!docSnapshot.exists()) {
-              cleanup();
-          }
-      });
 
+      activeCallListener = onSnapshot(callDocRef, (docSnapshot) => {
+        if (!docSnapshot.exists()) {
+          cleanup();
+        }
+      });
     } catch (err: any) {
       console.error("Error answering call:", err);
-      setCallState((prev) => ({
+      setCallState?.((prev) => ({
         ...prev,
         status: "error",
         errorMessage: "Failed to connect call.",
@@ -357,16 +378,18 @@ export const callManager = {
   },
 
   rejectCall: async () => {
-      if (callId) {
+    if (callId) {
+      try {
+        await updateDoc(doc(db, "calls", callId), { status: "rejected" });
+        // Allow some time for caller to receive update then delete
+        setTimeout(async () => {
           try {
-              await updateDoc(doc(db, "calls", callId), { status: 'rejected' });
-              // Allow some time for caller to receive update then delete
-              setTimeout(async () => {
-                  try { await deleteDoc(doc(db, "calls", callId!)); } catch(e){}
-              }, 1000);
-          } catch(e) {}
-      }
-      cleanup();
+            await deleteDoc(doc(db, "calls", callId!));
+          } catch (e) {}
+        }, 1000);
+      } catch (e) {}
+    }
+    cleanup();
   },
 
   hangUp: async () => {
@@ -375,21 +398,25 @@ export const callManager = {
     if (currentCallId) {
       try {
         await deleteDoc(doc(db, "calls", currentCallId));
-      } catch (e) { }
+      } catch (e) {}
     }
   },
 
   toggleMute: (isMuted: boolean) => {
     if (localStreamRef && setCallState) {
-      localStreamRef.getAudioTracks().forEach((track) => (track.enabled = !isMuted));
-      setCallState((prev) => ({ ...prev, isMuted }));
+      localStreamRef
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = !isMuted));
+      setCallState?.((prev) => ({ ...prev, isMuted }));
     }
   },
 
   toggleVideo: (isVideoOff: boolean) => {
     if (localStreamRef && setCallState) {
-      localStreamRef.getVideoTracks().forEach((track) => (track.enabled = !isVideoOff));
-      setCallState((prev) => ({ ...prev, isVideoOff }));
+      localStreamRef
+        .getVideoTracks()
+        .forEach((track) => (track.enabled = !isVideoOff));
+      setCallState?.((prev) => ({ ...prev, isVideoOff }));
     }
   },
 };
