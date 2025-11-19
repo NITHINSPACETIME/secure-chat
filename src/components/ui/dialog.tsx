@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,13 +8,20 @@ const DialogContext = React.createContext<{
   onOpenChange: (open: boolean) => void;
 }>({ open: false, onOpenChange: () => {} });
 
-export const Dialog: React.FC<{ children: React.ReactNode; open: boolean; onOpenChange: (open: boolean) => void; }> = ({ children, open, onOpenChange }) => (
+export const Dialog: React.FC<{
+  children: React.ReactNode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}> = ({ children, open, onOpenChange }) => (
   <DialogContext.Provider value={{ open, onOpenChange }}>
     {children}
   </DialogContext.Provider>
 );
 
-export const DialogTrigger: React.FC<{ children: React.ReactNode; asChild?: boolean; }> = ({ children, asChild }) => {
+export const DialogTrigger: React.FC<{
+  children: React.ReactNode;
+  asChild?: boolean;
+}> = ({ children, asChild }) => {
   const { onOpenChange } = React.useContext(DialogContext);
   if (asChild) {
     const child = React.Children.only(children) as React.ReactElement<any>;
@@ -30,7 +36,10 @@ export const DialogTrigger: React.FC<{ children: React.ReactNode; asChild?: bool
   return <button onClick={() => onOpenChange(true)}>{children}</button>;
 };
 
-export const DialogContent: React.FC<{ children: React.ReactNode; className?: string; }> = ({ children, className }) => {
+export const DialogContent: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className }) => {
   const { open, onOpenChange } = React.useContext(DialogContext);
 
   return createPortal(
@@ -64,7 +73,10 @@ export const DialogContent: React.FC<{ children: React.ReactNode; className?: st
   );
 };
 
-export const DialogHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
+export const DialogHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...props
+}) => (
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0",
@@ -73,7 +85,9 @@ export const DialogHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ c
     {...props}
   />
 );
-export const DialogTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ className, ...props }) => (
+export const DialogTitle: React.FC<
+  React.HTMLAttributes<HTMLHeadingElement>
+> = ({ className, ...props }) => (
   <div
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
@@ -82,6 +96,8 @@ export const DialogTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = (
     {...props}
   />
 );
-export const DialogDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({ className, ...props }) => (
+export const DialogDescription: React.FC<
+  React.HTMLAttributes<HTMLParagraphElement>
+> = ({ className, ...props }) => (
   <div className={cn("text-sm text-muted-foreground", className)} {...props} />
 );
