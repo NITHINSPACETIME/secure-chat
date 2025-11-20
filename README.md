@@ -5,38 +5,38 @@
 
 **Privacy is a right, not a feature.**
 
-Project Nyx is a decentralized-style messaging application built to prove that secure communication doesn't require your phone number, email, or government ID. We use **Curve25519** cryptography to ensure that even if our database is compromised, your messages look like mathematical garbage to anyone but the intended recipient.
+Project Nyx is a decentralized-style messaging application built to prove that secure communication doesn't require your phone number, email, or government ID. We use (**Curve25519**) cryptography to ensure that even if our database is compromised, your messages look like mathematical garbage to anyone but the intended recipient...
 
-No trackers. No ads. No metadata mining. Just you and the person you're talking to.
+No trackers. No ads. No metadata mining. Just you and the person you're talking to. (only if you have a person to talk...lol)
 
 -----
 
 ## 🧠 How it Works (The Architecture)
 
-Unlike traditional chat apps that store your messages in plain text (or hold the keys themselves), ProjectNyx operates as a **Zero-Knowledge Relay**.
+Unlike traditional chat apps that store your messages in plain text (or hold the keys themselves), ProjectNyx operates as a **Zero-Knowledge Relay** And we are thriving for "ONION ROUTING SOON".
 
 ### The Security Model
 
-We use the **Signal-style encryption flow**. Keys are generated locally on your device and never leave it.
+We use the **Cryptographic encryption key system**. Keys are generated locally on your device and never leave it.
 
 ```mermaid
 sequenceDiagram
-    participant Alice
-    participant Cloud as Blind Relay (Firebase)
-    participant Bob
+    participant Nanako as User Nanakochan
+    participant Cloud as Cloud (Blind Relay)
+    participant Shiina as User Shiinachan
 
-    Note over Alice, Bob: 1. Handshake (Public Keys Exchanged)
-    Alice->>Alice: Encrypt Message (Bob's Public Key + Alice's Private Key)
-    Alice->>Cloud: Send Encrypted Blob (0x8f3a...)
+    Note over Nanako, Shiina: 1. Handshake (Public Keys Exchanged)
+    Nanako->>Nanako: Encrypt Message<br/>(Shiina's Public Key + Nanako's Private Key)
+    Nanako->>Cloud: Send Encrypted Trash (0x8f3a...)
     Note right of Cloud: The Cloud cannot read this.<br/>It only sees random bytes.
-    Cloud->>Bob: Push Encrypted Blob
-    Bob->>Bob: Decrypt (Alice's Public Key + Bob's Private Key)
-    Note over Bob: Message becomes readable
+    Cloud->>Shiina: Push Encrypted Trash
+    Shiina->>Shiina: Decrypt<br/>(Nanako's Public Key + Shiina's Private Key)
+    Note over Shiina: Message becomes readable
 ```
 
 ### Identity Generation
 
-Your identity is math, not a row in a database. We don't store passwords, which means we can't reset them. Your 12-word phrase is the seed for everything.
+Your identity is math probabaility high-end stuff (nevermind), not a row in a database. We don't store passwords or your lovely chats, which means we can't reset them. Your 12-word phrase is the seed for everything.
 
 ```mermaid
 graph TD
@@ -53,12 +53,12 @@ graph TD
 
 ## ✨ Features
 
-  * **🚫 No Phone Numbers:** Sign up with a cryptographic key. Total anonymity.
-  * **🔒 Session-Grade Encryption:** Uses `tweetnacl` (Curve25519) for high-speed, military-grade security.
-  * **📱 Responsive Design:** Works flawlessly on Desktop, Mobile, and Tablets with a responsive split-view UI.
-  * **🌗 Theming:** Beautiful Dark/Light modes with a clean, distraction-free interface.
-  * **⚡ Real-Time:** Instant message delivery using Firestore snapshots.
-  * **📸 Media Sharing:** Securely share images (Base64 encoded and encrypted).
+  * **🚫 No Phone Numbers:** Sign up with a Nyx cryptographic key. Total anonymity.
+  * **🔒 ECE-Grade Encryption:** Uses `tweetnacl` (Curve25519) for high-speed, High-grade security.
+  * **📱 Responsive Design:** Works flawlessly on Desktop, Mobile, and Tablets with a responsive split-view UI (Still working on an app though).
+  * **🌗 Theming:** Beautiful (i guess) Dark/Light modes with a clean, distraction-free interface.
+  * **⚡ Real-Time:** Instant message delivery using Firestore snapshots (obv, they are encrypted).
+  * **📸 Media Sharing:** Securely share images (Still working).
 
 -----
 
@@ -77,7 +77,7 @@ We kept the stack modern and fast. No legacy code here.
 
 ## 🚀 Getting Started
 
-Want to run this locally or contribute? Follow these steps.
+Want to run this locally on your computer or contribute? Follow these steps.
 
 ### Prerequisites
 
@@ -139,7 +139,7 @@ Open `http://localhost:5173` in your browser.
 
 ## 🤝 Contributing
 
-We welcome contributions\! Whether it's fixing a typo, improving the UI, or auditing the crypto implementation.
+We welcome contributions (Cause comeon i can't do it alone, nvm i can do it alone)\! Whether it's fixing a typo, improving the UI, or auditing the crypto implementation.
 
 1.  **Fork** the repository.
 2.  Create a new branch: `git checkout -b feature/amazing-feature`.
@@ -157,17 +157,17 @@ We welcome contributions\! Whether it's fixing a typo, improving the UI, or audi
 
 ### Roadmap
 
-  - [ ] Voice & Video Calls (WebRTC)
+  - [ ] Voice & Video Calls (Nyx WebRTC)
   - [ ] Group Chats
-  - [ ] Disappearing Messages (TTL)
-  - [ ] Desktop Electron App
+  - [ ] Disappearing Messages (Still Working)
+  - [ ] Desktop Electron App and Android App (SOON!!!)
 
 -----
 
 ## ⚠️ Security Disclaimer
 
-*This project is currently in **Alpha**. While we use standard cryptographic libraries (TweetNaCl), this specific implementation has not yet undergone a third-party security audit. Use for casual privacy, but maybe stick to Signal for whistleblowing on governments (for now).*
+*This project is currently in (**pre-Alpha Stages**). While we use standard cryptographic libraries (Nyx), this specific implementation has not yet undergone a third-party security audit. Use for casual privacy, Don't Start whistleblowing on governments (for now though).*
 
 -----
 
-**Built by NITHINSPACETIME**
+**Built by NITHINSPACETIME (ahh)**
