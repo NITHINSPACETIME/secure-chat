@@ -1,13 +1,7 @@
-import {
-  Shield,
-  MessageSquare,
-  Lock,
-  Globe,
-  ChevronRight,
-  ArrowRight,
-} from "lucide-react";
-import { Button } from "../components/ui/button";
-import { motion, Variants } from "framer-motion";
+import { useState, useEffect } from "react";
+import { Shield, ChevronRight, Activity, Lock, Globe, Cpu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type WelcomeScreenProps = {
   onCreateAccount: () => void;
@@ -18,173 +12,167 @@ export function WelcomeScreen({
   onCreateAccount,
   onRestoreAccount,
 }: WelcomeScreenProps) {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  };
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [activeTab, setActiveTab] = useState<"create" | "restore" | null>(null);
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
-  };
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth) * 20 - 10,
+        y: (e.clientY / window.innerHeight) * 20 - 10,
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   return (
-    <div className="min-h-screen w-full flex bg-background font-sans overflow-hidden">
-      {/* Left Side - Hero & Brand */}
-      <div className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-16 text-white overflow-hidden bg-zinc-950">
-        {/* Animated Background Mesh */}
-        <div className="absolute inset-0 z-0 opacity-40">
-          <div
-            className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-blue-600/30 rounded-full blur-[120px] animate-pulse"
-            style={{ animationDuration: "8s" }}
-          />
-          <div
-            className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-600/20 rounded-full blur-[100px] animate-pulse"
-            style={{ animationDuration: "12s", animationDelay: "1s" }}
-          />
-          <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[80px]" />
+    <div className="min-h-screen w-full bg-[#050505] text-white overflow-hidden relative flex flex-col font-sans selection:bg-white/30">
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(20,20,30,1)_0%,_rgba(0,0,0,1)_100%)]" />
+
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px)`,
+          }}
+        >
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-white animate-pulse"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: `${Math.random() * 2 + 1}px`,
+                height: `${Math.random() * 2 + 1}px`,
+                animationDelay: `${Math.random() * 5}s`,
+                opacity: Math.random() * 0.7,
+              }}
+            />
+          ))}
         </div>
 
-        {/* Grid Pattern Overlay */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light z-0"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-900/20 blur-[120px] rounded-full mix-blend-screen" />
+      </div>
 
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-900/20">
-            <Shield className="h-6 w-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-white">
-            ProjectNyx
+      <nav className="relative z-50 flex items-center justify-between px-8 py-6 md:px-16">
+        <div className="flex items-center gap-4 group cursor-pointer">
+          <Shield className="w-6 h-6 text-white transition-all duration-500 group-hover:scale-110" />
+          <span className="font-bold text-xl tracking-[0.25em] text-white group-hover:text-gray-300 transition-colors">
+            NYX
           </span>
         </div>
 
-        <motion.div
-          className="relative z-10 max-w-xl space-y-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.h1
-            variants={itemVariants}
-            className="text-5xl xl:text-6xl font-extrabold leading-[1.1] tracking-tight"
-          >
-            Privacy is not
-            <br />
-            an option,
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400">
-              it's a right.
+        <div className="hidden md:flex items-center gap-12 text-[11px] font-bold tracking-[0.2em] text-gray-500">
+          {["Nyx POTOCOL", "NODES", "SECURITY", "MANIFESTO"].map((item) => (
+            <span
+              key={item}
+              className="hover:text-white cursor-pointer transition-all duration-300 hover:tracking-[0.3em]"
+            >
+              {item}
             </span>
-          </motion.h1>
-
-          <motion.p
-            variants={itemVariants}
-            className="text-lg text-zinc-400 leading-relaxed max-w-md"
-          >
-            Connect globally with a decentralized protocol. No phone numbers. No
-            tracking. Just you and your keys.
-          </motion.p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-            <motion.div
-              variants={itemVariants}
-              className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors"
-            >
-              <Lock className="w-6 h-6 text-emerald-400 mb-3" />
-              <h3 className="font-semibold text-white">End-to-End Encrypted</h3>
-              <p className="text-sm text-zinc-400 mt-1">
-                Your messages are encrypted before they leave your device.
-              </p>
-            </motion.div>
-            <motion.div
-              variants={itemVariants}
-              className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors"
-            >
-              <Globe className="w-6 h-6 text-blue-400 mb-3" />
-              <h3 className="font-semibold text-white">Decentralized ID</h3>
-              <p className="text-sm text-zinc-400 mt-1">
-                No central server holds your identity. You own your data.
-              </p>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        <div className="relative z-10 flex items-center gap-6 text-xs font-medium text-zinc-500 uppercase tracking-widest">
-          <span>Zero Knowledge Architecture</span>
-          <div className="h-1 w-1 bg-zinc-700 rounded-full" />
-          <span>Open Source</span>
+          ))}
         </div>
-      </div>
 
-      {/* Right Side - Actions */}
-      <div className="w-full lg:w-[45%] flex flex-col items-center justify-center p-8 bg-background relative z-20">
-        <div className="w-full max-w-md space-y-10">
-          <div className="text-center lg:text-left space-y-2">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                Get Started
-              </h2>
-              <p className="text-muted-foreground">
-                Create a new identity or access your existing vault.
-              </p>
-            </motion.div>
-          </div>
+        <Button
+          onClick={() =>
+            document
+              .getElementById("action-area")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+          className="rounded-full bg-white text-black hover:bg-gray-200 transition-all duration-300 px-8 py-6 text-xs font-bold tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]"
+        >
+          GET STARTED
+        </Button>
+      </nav>
 
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+      <main className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
+        <div className="mb-8 overflow-hidden">
+          <p className="text-[10px] md:text-xs font-mono text-gray-500 tracking-[1.5em] uppercase animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+            PROJECT
+          </p>
+        </div>
+
+        <h1 className="relative text-[140px] md:text-[280px] font-bold leading-none tracking-tighter select-none animate-in zoom-in-95 duration-1000 fill-mode-forwards">
+          <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-300 to-gray-800 drop-shadow-2xl">
+            Nyx
+          </span>
+
+          <span className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-tr from-transparent via-white/20 to-transparent bg-[length:200%_auto] animate-shine pointer-events-none" />
+        </h1>
+
+        <div
+          id="action-area"
+          className="mt-24 w-full max-w-4xl perspective-1000"
+        >
+          <div
+            className={cn(
+              "relative grid grid-cols-1 md:grid-cols-2 gap-6 p-1 transition-all duration-500",
+              activeTab ? "opacity-100 translate-y-0" : "opacity-100"
+            )}
           >
-            <Button
+            <div
               onClick={onCreateAccount}
-              className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-xl group"
-              size="lg"
+              className="group relative h-64 bg-zinc-900/40 backdrop-blur-md border border-white/5 hover:border-white/20 rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
             >
-              Create New Identity
-              <ArrowRight className="w-4 h-4 ml-2 opacity-70 group-hover:translate-x-1 transition-transform" />
-            </Button>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-border"></div>
-              <span className="flex-shrink-0 mx-4 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-                Or
-              </span>
-              <div className="flex-grow border-t border-border"></div>
+              <div className="absolute top-6 left-6">
+                <Cpu className="w-8 h-8 text-gray-400 group-hover:text-white transition-colors duration-500" />
+              </div>
+
+              <div className="absolute bottom-6 left-6 right-6">
+                <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                  Create Account
+                  <ChevronRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                </h3>
+                <p className="text-sm text-gray-500 font-mono group-hover:text-gray-300 transition-colors">
+                  Initialize new Curve25519 cryptographic keys. Zero knowledge
+                  generation.
+                </p>
+              </div>
             </div>
 
-            <Button
+            <div
               onClick={onRestoreAccount}
-              variant="outline"
-              className="w-full h-14 text-base font-medium rounded-xl hover:bg-muted border-border"
-              size="lg"
+              className="group relative h-64 bg-zinc-900/40 backdrop-blur-md border border-white/5 hover:border-white/20 rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
             >
-              Restore Existing Account
-            </Button>
-          </motion.div>
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-          <motion.p
-            className="text-xs text-center text-muted-foreground/70"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            By continuing, you acknowledge that Project Nyx cannot recover your
-            password if lost.
-            <br className="hidden sm:block" /> We do not store your keys.
-          </motion.p>
+              <div className="absolute top-6 left-6">
+                <Globe className="w-8 h-8 text-gray-400 group-hover:text-white transition-colors duration-500" />
+              </div>
+
+              <div className="absolute bottom-6 left-6 right-6">
+                <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                  Restore Access
+                  <ChevronRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                </h3>
+                <p className="text-sm text-gray-500 font-mono group-hover:text-gray-300 transition-colors">
+                  Recover session using 12-word mnemonic or Nyx private key.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+
+      <footer className="relative z-10 p-8 text-center">
+        <div className="inline-flex items-center gap-8 text-[10px] text-gray-600 font-mono uppercase tracking-widest">
+          <span className="hover:text-white transition-colors cursor-help">
+            Project Nyx v0.07
+          </span>
+          <span className="w-1 h-1 bg-gray-800 rounded-full" />
+          <span className="hover:text-white transition-colors cursor-help">
+            No Metadata
+          </span>
+          <span className="w-1 h-1 bg-gray-800 rounded-full" />
+          <span className="hover:text-white transition-colors cursor-help">
+            Open Source
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }

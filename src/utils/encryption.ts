@@ -1,4 +1,3 @@
-
 import nacl from "tweetnacl";
 import util from "tweetnacl-util";
 
@@ -62,5 +61,26 @@ export function decryptMessage(
     return util.encodeUTF8(decrypted);
   } catch (error) {
     return "🔒 Unreadable Message";
+  }
+}
+
+export function generateSafetyNumber(keyA: string, keyB: string): string {
+  try {
+    const sortedKeys = [keyA, keyB].sort();
+    const combined = sortedKeys[0] + sortedKeys[1];
+
+    const hash = nacl.hash(util.decodeUTF8(combined));
+
+    let numericString = "";
+    for (let i = 0; i < hash.length; i++) {
+      numericString += hash[i].toString();
+    }
+
+    const code = numericString.substring(0, 60);
+    const chunks = code.match(/.{1,5}/g) || [];
+
+    return chunks.slice(0, 12).join(" ");
+  } catch (e) {
+    return "Error Generating Safety Number";
   }
 }
