@@ -1,5 +1,16 @@
-
-export async function uploadFile({ file }: { file: File; }): Promise<{ url: string }> {
+/**
+ * MOCK SERVICES
+ *
+ * These functions simulate external API calls (File Storage, AI Analysis)
+ * for local development purposes.
+ *
+ * TODO: Integrate with AWS S3 and OpenAI API in production environment.
+ */
+export async function uploadFile({
+  file,
+}: {
+  file: File;
+}): Promise<{ url: string }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -8,8 +19,10 @@ export async function uploadFile({ file }: { file: File; }): Promise<{ url: stri
   });
 }
 
-export async function analyzeImage({ imageUrl, prompt, }: any): Promise<{ analysis: any }> {
-  // Simulating AI analysis delay for QR scanning
+export async function analyzeImage({
+  imageUrl,
+  prompt,
+}: any): Promise<{ analysis: any }> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -23,7 +36,11 @@ export async function analyzeImage({ imageUrl, prompt, }: any): Promise<{ analys
   });
 }
 
-export async function compressImage(file: File, maxWidth = 800, quality = 0.7): Promise<string> {
+export async function compressImage(
+  file: File,
+  maxWidth = 800,
+  quality = 0.7
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
