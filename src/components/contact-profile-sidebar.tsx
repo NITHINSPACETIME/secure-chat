@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAtom } from "jotai";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -23,7 +22,7 @@ import {
   History,
   ShieldCheck,
   Fingerprint,
-  Info
+  Info,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
@@ -35,6 +34,7 @@ import {
   activeConversationIdAtom,
 } from "../atoms/conversations";
 import { currentUserAtom, User } from "../atoms/user";
+import { generateSafetyNumber } from "../utils/encryption"; // Import the real function
 
 type ContactProfileSidebarProps = {
   isOpen: boolean;
@@ -70,13 +70,14 @@ export function ContactProfileSidebar({
       fetchProfile();
     } else {
       setTimeout(() => {
-          setPartnerData(null);
-          setVerified(false);
+        setPartnerData(null);
+        setVerified(false);
       }, 300);
     }
   }, [isOpen, partnerId]);
 
-  const closeSidebar = () => setSidebarState({ isOpen: false, partnerId: null });
+  const closeSidebar = () =>
+    setSidebarState({ isOpen: false, partnerId: null });
 
   const copyId = () => {
     if (!partnerId) return;
@@ -123,11 +124,12 @@ export function ContactProfileSidebar({
       toast({ title: "Error deleting chat", variant: "destructive" });
     }
   };
-  
-  // Simulated Safety Number (Signal style)
-  const safetyNumber = partnerId ? Array.from({length: 12}, (_, i) => 
-    parseInt(partnerId.charCodeAt(i % partnerId.length).toString(), 10) % 10000
-  ).map(n => n.toString().padStart(4, '0')).join(' ') : '';
+
+  const safetyNumber = useMemo(() => {
+    if (!currentUser.publicKey || !partnerData?.publicKey)
+      return "Waiting for keys...";
+    return generateSafetyNumber(currentUser.publicKey, partnerData.publicKey);
+  }, [currentUser.publicKey, partnerData?.publicKey]);
 
   return (
     <AnimatePresence>
@@ -171,7 +173,12 @@ export function ContactProfileSidebar({
               </div>
               <div className="px-6 -mt-12 mb-4 relative z-10">
                 <Avatar className="w-24 h-24 border-4 border-background shadow-lg bg-muted">
-                  {partnerData.avatar && <AvatarImage src={partnerData.avatar} className="object-cover" />}
+                  {partnerData.avatar && (
+                    <AvatarImage
+                      src={partnerData.avatar}
+                      className="object-cover"
+                    />
+                  )}
                   <AvatarFallback className="bg-muted text-2xl font-bold text-muted-foreground">
                     {partnerData.name[0].toUpperCase()}
                   </AvatarFallback>
@@ -181,7 +188,9 @@ export function ContactProfileSidebar({
 
             <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-8">
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight">{partnerData.name}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">
+                  {partnerData.name}
+                </h2>
                 {partnerData.statusMessage && (
                   <p className="text-sm text-muted-foreground italic border-l-2 border-primary/50 pl-3 py-1">
                     "{partnerData.statusMessage}"
@@ -190,58 +199,77 @@ export function ContactProfileSidebar({
               </div>
 
               <div className="space-y-5">
-                 
-                 {partnerData.bio && (
+                {partnerData.bio && (
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                        <Info className="w-3 h-3" /> About
+                      <Info className="w-3 h-3" /> About
                     </label>
-                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{partnerData.bio}</p>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                      {partnerData.bio}
+                    </p>
                   </div>
-                 )}
-                 
-                 <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">User ID</label>
-                    <div className="flex items-center gap-2 bg-muted/40 p-2.5 rounded-lg border border-border/50 group hover:border-border transition-colors">
-                      <p className="text-xs font-mono truncate flex-1 text-muted-foreground select-all">
-                        {partnerId}
-                      </p>
-                      <Button size="icon" variant="ghost" className="h-6 w-6 flex-shrink-0 opacity-50 group-hover:opacity-100 transition-opacity" onClick={copyId}>
-                        {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-                      </Button>
-                    </div>
-                 </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    User ID
+                  </label>
+                  <div className="flex items-center gap-2 bg-muted/40 p-2.5 rounded-lg border border-border/50 group hover:border-border transition-colors">
+                    <p className="text-xs font-mono truncate flex-1 text-muted-foreground select-all">
+                      {partnerId}
+                    </p>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 flex-shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
+                      onClick={copyId}
+                    >
+                      {copied ? (
+                        <Check className="w-3 h-3 text-green-500" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
-              
-              {/* Safety Number / Encryption Verification Feature */}
+
               <div className="space-y-3 pt-4 border-t border-border/50">
-                 <h3 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-2">
-                    <ShieldCheck className="w-3 h-3" />
-                    Encryption
-                 </h3>
-                 <div 
-                    className={`p-4 rounded-xl border transition-all cursor-pointer overflow-hidden relative ${verified ? 'bg-green-500/5 border-green-500/20' : 'bg-card border-border hover:border-primary/30'}`}
-                    onClick={() => setVerified(!verified)}
-                 >
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium flex items-center gap-2">
-                          <Fingerprint className="w-4 h-4 opacity-70" />
-                          Safety Number
-                        </span>
-                        {verified ? (
-                            <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-sm">
-                              <Check className="w-3 h-3" /> VERIFIED
-                            </span>
-                        ) : (
-                             <span className="text-[10px] text-primary font-medium">Verify</span>
-                        )}
-                    </div>
-                    <div className="grid grid-cols-4 gap-y-1 gap-x-2 font-mono text-[10px] text-muted-foreground opacity-70 select-none text-center">
-                        {safetyNumber.split(' ').map((chunk, i) => (
-                            <span key={i} className="bg-muted/30 rounded px-1">{chunk}</span>
-                        ))}
-                    </div>
-                 </div>
+                <h3 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-3 h-3" />
+                  Nyx Encryption
+                </h3>
+                <div
+                  className={`p-4 rounded-xl border transition-all cursor-pointer overflow-hidden relative ${
+                    verified
+                      ? "bg-green-500/5 border-green-500/20"
+                      : "bg-card border-border hover:border-primary/30"
+                  }`}
+                  onClick={() => setVerified(!verified)}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium flex items-center gap-2">
+                      <Fingerprint className="w-4 h-4 opacity-70" />
+                      Safety Number
+                    </span>
+                    {verified ? (
+                      <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                        <Check className="w-3 h-3" /> VERIFIED
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-primary font-medium">
+                        Verify
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-4 gap-y-1 gap-x-2 font-mono text-[10px] text-muted-foreground opacity-70 select-none text-center">
+                    {safetyNumber.split(" ").map((chunk, i) => (
+                      <span key={i} className="bg-muted/30 rounded px-1">
+                        {chunk}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1 pt-4 border-t border-border/50">
