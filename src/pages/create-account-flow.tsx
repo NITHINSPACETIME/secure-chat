@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Shield,
@@ -44,7 +43,6 @@ export function CreateAccountFlow({
   const [step, setStep] = useState<Step>("name");
   const [displayName, setDisplayName] = useState("");
   
-  // Generate once
   const [recoveryPhrase] = useState(generateRecoveryPhrase());
   const [sessionId] = useState(deriveSessionIdFromPhrase(recoveryPhrase));
 
@@ -72,7 +70,6 @@ export function CreateAccountFlow({
       }
       setStep("recovery");
     } catch (error) {
-      // Allow continue on error (offline dev or network issue)
       setStep("recovery");
     } finally {
       setIsChecking(false);
@@ -98,7 +95,6 @@ export function CreateAccountFlow({
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background p-4 md:p-8">
-      {/* Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 bg-muted">
          <motion.div 
            className="h-full bg-primary"
@@ -109,7 +105,6 @@ export function CreateAccountFlow({
       </div>
 
       <div className="max-w-md w-full space-y-8 relative">
-         {/* Navigation */}
          <div className="flex items-center justify-between">
             <Button 
                 variant="ghost" 
@@ -120,7 +115,7 @@ export function CreateAccountFlow({
                 <ArrowLeft className="w-5 h-5" />
             </Button>
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Step {stepProgress[step]} of 3</span>
-            <div className="w-10" /> {/* Spacer for balance */}
+            <div className="w-10" />
          </div>
 
          <AnimatePresence mode="wait">
@@ -132,7 +127,6 @@ export function CreateAccountFlow({
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="space-y-8"
             >
-                {/* STEP 1: NAME */}
                 {step === 'name' && (
                     <div className="space-y-6">
                         <div className="text-center space-y-2">
@@ -160,14 +154,13 @@ export function CreateAccountFlow({
                                 {nameError && <p className="text-destructive text-sm font-medium flex items-center gap-1 pl-1"><AlertTriangle className="w-4 h-4"/> {nameError}</p>}
                             </div>
                             
-                            <Button onClick={handleContinueFromName} disabled={!displayName.trim() || isChecking} className="w-full h-14 text-base rounded-xl font-semibold shadow-lg shadow-primary/20" size="lg">
+                            <Button onClick={handleContinueFromName} disabled={!displayName.trim() || isChecking} className="w-full h-14 text-base rounded-xl font-semibold shadow-lg shadow-primary/20"[...]
                                 {isChecking ? <Loader2 className="animate-spin w-5 h-5" /> : "Continue"}
                             </Button>
                         </div>
                     </div>
                 )}
 
-                {/* STEP 2: RECOVERY */}
                 {step === 'recovery' && (
                     <div className="space-y-6">
                          <div className="text-center space-y-2">
@@ -225,7 +218,6 @@ export function CreateAccountFlow({
                     </div>
                 )}
 
-                {/* STEP 3: CONFIRM */}
                 {step === 'confirm' && (
                     <div className="space-y-8 text-center py-8">
                         <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto animate-in zoom-in duration-700">
