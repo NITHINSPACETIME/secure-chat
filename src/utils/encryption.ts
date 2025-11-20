@@ -84,3 +84,48 @@ export function generateSafetyNumber(keyA: string, keyB: string): string {
     return "Error Generating Safety Number";
   }
 }
+
+export function encryptFile(fileData: Uint8Array): {
+  encryptedData: Uint8Array;
+  key: string;
+} {
+  try {
+    const key = nacl.randomBytes(nacl.secretbox.keyLength);
+
+    const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
+
+    const encrypted = nacl.secretbox(fileData, nonce, key);
+
+    const fullData = new Uint8Array(nonce.length + encrypted.length);
+    fullData.set(nonce);
+    fullData.set(encrypted, nonce.length);
+
+    return {
+      encryptedData: fullData,
+      key: util.encodeBase64(key),
+    };
+  } catch (e) {
+    console.error("File Encryption Failed", e);
+    throw new Error("Failed to encrypt file data");
+  }
+}
+
+export function decryptFile(
+  encryptedData: Uint8Array,
+  key64: string
+): Uint8Array | null {
+  try {
+    const key = util.decodeBase64(key64);
+
+    const nonce = encryptedData.slice(0, nacl.secretbox.nonceLength);
+
+    const message = encryptedData.slice(nacl.secretbox.nonceLength);
+
+    const decrypted = nacl.secretbox.open(message, nonce, key);
+
+    return decrypted;
+  } catch (e) {
+    console.error("File Decryption Failed", e);
+    return null;
+  }
+}
