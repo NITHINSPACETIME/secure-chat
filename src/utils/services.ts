@@ -1,11 +1,46 @@
 /**
  * MOCK SERVICES
  *
- * These functions simulate external API calls (File Storage, AI Analysis)
+ * So These functions simulate external API calls (Like File Storage, AI Analysis bla bla)
  * for local development purposes.
  *
- * TODO: Integrate with AWS S3 and OpenAI API in production environment.
+ * TODO: Integrate with AWS S3 and OpenAI API (i dont like openAI though) in production environment.
  */
+/**
+ * Okay so guys this just Simulates uploading encrypted binary data to cloud storage.
+ * In a real app, this would upload 'data' to Firebase Storage / AWS S3 or other server
+ * and return the public download Nyx URL.
+ */
+
+export async function uploadEncryptedFile(
+  data: Uint8Array,
+  mimeType: string
+): Promise<string> {
+  return new Promise((resolve) => {
+    const blob = new Blob([data as any], { type: "application/octet-stream" });
+    const mockUrl = URL.createObjectURL(blob);
+
+    setTimeout(() => {
+      resolve(mockUrl);
+    }, 1000);
+  });
+}
+
+export async function fileToUint8Array(file: File): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        resolve(new Uint8Array(e.target.result as ArrayBuffer));
+      } else {
+        reject(new Error("Failed to read file"));
+      }
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
+
 export async function uploadFile({
   file,
 }: {
