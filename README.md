@@ -21,16 +21,16 @@ We use the **Cryptographic encryption key system**. Keys are generated locally o
 
 ```mermaid
 sequenceDiagram
-    User Nanakochan
-    participant Cloud as Blind Relay (Firebase)
-    User Shiinachan
+    participant Nanako as User Nanakochan
+    participant Cloud as Cloud (Blind Relay)
+    participant Shiina as User Shiinachan
 
     Note over Nanako, Shiina: 1. Handshake (Public Keys Exchanged)
-    Nanako->>Nanako: Encrypt Message (Shiina's Public Key + Nanako's Private Key)
+    Nanako->>Nanako: Encrypt Message<br/>(Shiina's Public Key + Nanako's Private Key)
     Nanako->>Cloud: Send Encrypted Trash (0x8f3a...)
     Note right of Cloud: The Cloud cannot read this.<br/>It only sees random bytes.
-    Nanako->>Shiina: Push Encrypted Trash
-    Shiina->>Shiina: Decrypt (Nanako's Public Key + Shiina's Private Key)
+    Cloud->>Shiina: Push Encrypted Trash
+    Shiina->>Shiina: Decrypt<br/>(Nanako's Public Key + Shiina's Private Key)
     Note over Shiina: Message becomes readable
 ```
 
