@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Shield, ChevronRight, Activity, Lock, Globe, Cpu } from "lucide-react";
+import { Shield, ChevronRight, Cpu, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +18,8 @@ export function WelcomeScreen({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({
-        x: (e.clientX / window.innerWidth) * 20 - 10,
-        y: (e.clientY / window.innerHeight) * 20 - 10,
+        x: e.clientX / window.innerWidth - 0.5,
+        y: e.clientY / window.innerHeight - 0.5,
       });
     };
     window.addEventListener("mousemove", handleMouseMove);
@@ -32,12 +32,12 @@ export function WelcomeScreen({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(20,20,30,1)_0%,_rgba(0,0,0,1)_100%)]" />
 
         <div
-          className="absolute inset-0 opacity-40"
+          className="absolute inset-0 opacity-40 transition-transform duration-1000 ease-out will-change-transform"
           style={{
-            transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px)`,
+            transform: `translate(${mousePos.x * 20}px, ${mousePos.y * 20}px)`,
           }}
         >
-          {[...Array(50)].map((_, i) => (
+          {[...Array(60)].map((_, i) => (
             <div
               key={i}
               className="absolute rounded-full bg-white animate-pulse"
@@ -47,13 +47,20 @@ export function WelcomeScreen({
                 width: `${Math.random() * 2 + 1}px`,
                 height: `${Math.random() * 2 + 1}px`,
                 animationDelay: `${Math.random() * 5}s`,
-                opacity: Math.random() * 0.7,
+                opacity: Math.random() * 0.6,
               }}
             />
           ))}
         </div>
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-900/20 blur-[120px] rounded-full mix-blend-screen" />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-blue-900/20 blur-[120px] rounded-full mix-blend-screen transition-transform duration-[1500ms] ease-out will-change-transform"
+          style={{
+            transform: `translate(-50%, -50%) translate(${
+              mousePos.x * -15
+            }px, ${mousePos.y * -15}px)`,
+          }}
+        />
       </div>
 
       <nav className="relative z-50 flex items-center justify-between px-8 py-6 md:px-16">
@@ -65,7 +72,7 @@ export function WelcomeScreen({
         </div>
 
         <div className="hidden md:flex items-center gap-12 text-[11px] font-bold tracking-[0.2em] text-gray-500">
-          {["Nyx POTOCOL", "NODES", "SECURITY", "MANIFESTO"].map((item) => (
+          {["Nyx PROTOCOL", "NODES", "SECURITY"].map((item) => (
             <span
               key={item}
               className="hover:text-white cursor-pointer transition-all duration-300 hover:tracking-[0.3em]"
@@ -88,23 +95,52 @@ export function WelcomeScreen({
       </nav>
 
       <main className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
-        <div className="mb-8 overflow-hidden">
+        <div className="mb-8 overflow-hidden relative z-10">
           <p className="text-[10px] md:text-xs font-mono text-gray-500 tracking-[1.5em] uppercase animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
             PROJECT
           </p>
         </div>
 
-        <h1 className="relative text-[140px] md:text-[280px] font-bold leading-none tracking-tighter select-none animate-in zoom-in-95 duration-1000 fill-mode-forwards">
-          <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-300 to-gray-800 drop-shadow-2xl">
-            Nyx
-          </span>
+        <div className="relative group cursor-default">
+          <h1 className="relative text-[140px] md:text-[280px] font-bold leading-none tracking-tighter select-none animate-in zoom-in-95 duration-1000 fill-mode-forwards z-10">
+            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-200 to-gray-600 drop-shadow-2xl">
+              Nyx
+            </span>
 
-          <span className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-tr from-transparent via-white/20 to-transparent bg-[length:200%_auto] animate-shine pointer-events-none" />
-        </h1>
+            <span className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-tr from-transparent via-white/20 to-transparent bg-[length:200%_auto] animate-shine pointer-events-none" />
+          </h1>
+
+          <div
+            className="absolute inset-0 z-20 pointer-events-none mix-blend-overlay opacity-70 transition-transform duration-700 ease-out will-change-transform"
+            style={{
+              transform: `translate(${mousePos.x * -80}px, ${
+                mousePos.y * -40
+              }px)`,
+            }}
+          >
+            <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-[radial-gradient(circle,rgba(255,255,255,0.3)_0%,transparent_70%)] blur-[50px]" />
+
+            <div className="absolute bottom-[-20%] right-[-10%] w-[90%] h-[90%] bg-[radial-gradient(circle,rgba(200,220,255,0.15)_0%,transparent_70%)] blur-[60px]" />
+
+            <div className="absolute top-[20%] left-[20%] w-[60%] h-[60%] bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,transparent_60%)] blur-[40px]" />
+          </div>
+
+          <div
+            className="absolute inset-0 z-20 pointer-events-none opacity-30 transition-transform duration-1000 ease-out"
+            style={{
+              backdropFilter: "blur(1px)",
+              transform: `translate(${mousePos.x * -40}px, ${
+                mousePos.y * -20
+              }px)`,
+              maskImage:
+                "radial-gradient(circle at center, black, transparent 80%)",
+            }}
+          />
+        </div>
 
         <div
           id="action-area"
-          className="mt-24 w-full max-w-4xl perspective-1000"
+          className="mt-24 w-full max-w-4xl perspective-1000 relative z-30"
         >
           <div
             className={cn(
@@ -128,7 +164,7 @@ export function WelcomeScreen({
                   <ChevronRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                 </h3>
                 <p className="text-sm text-gray-500 font-mono group-hover:text-gray-300 transition-colors">
-                  Initialize new Curve25519 cryptographic keys. Zero knowledge
+                  Initialize Nyx Curve25519 cryptographic keys. Zero knowledge
                   generation.
                 </p>
               </div>
@@ -146,7 +182,7 @@ export function WelcomeScreen({
 
               <div className="absolute bottom-6 left-6 right-6">
                 <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                  Restore Access
+                  Restore Account Access
                   <ChevronRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                 </h3>
                 <p className="text-sm text-gray-500 font-mono group-hover:text-gray-300 transition-colors">
@@ -161,7 +197,7 @@ export function WelcomeScreen({
       <footer className="relative z-10 p-8 text-center">
         <div className="inline-flex items-center gap-8 text-[10px] text-gray-600 font-mono uppercase tracking-widest">
           <span className="hover:text-white transition-colors cursor-help">
-            Project Nyx v0.07
+            Project Nyx v0.10
           </span>
           <span className="w-1 h-1 bg-gray-800 rounded-full" />
           <span className="hover:text-white transition-colors cursor-help">
