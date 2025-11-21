@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="voidBack" cx="50%" cy="0%" r="100%">
+      <stop offset="0%" style="stop-color:#1e1b4b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#020617;stop-opacity:1" />
+    </radialGradient>
+
+    <linearGradient id="beam1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" /> <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" /> </linearGradient>
+
+    <linearGradient id="beam2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#c084fc;stop-opacity:1" /> <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" /> </linearGradient>
+    
+    <linearGradient id="beam3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f472b6;stop-opacity:1" /> <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" /> </linearGradient>
+
+    <filter id="intenseGlow" height="300%" width="300%" x="-100%" y="-100%">
+      <feGaussianBlur stdDeviation="12" result="coloredBlur" />
+      <feComponentTransfer in="coloredBlur" result="brightBlur">
+         <feFuncR type="linear" slope="1.5"/>
+         <feFuncG type="linear" slope="1.5"/>
+         <feFuncB type="linear" slope="1.5"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="brightBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="textGlow">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#8b5cf6" flood-opacity="0.8"/>
+    </filter>
+
+    <style>
+      .logo-text {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 900;
+        font-size: 52px;
+        letter-spacing: 12px;
+        text-anchor: middle;
+        fill: white;
+        text-transform: uppercase;
+      }
+    </style>
+  </defs>
+
+  <rect width="512" height="512" rx="128" fill="url(#voidBack)" />
+  
+  <path d="M0 512 L512 0" stroke="white" stroke-width="1" stroke-opacity="0.03" />
+  <path d="M0 0 L512 512" stroke="white" stroke-width="1" stroke-opacity="0.03" />
+
+  <g transform="translate(256, 240)" filter="url(#intenseGlow)">
+      
+      <path d="M -90 -110 L -90 110" 
+            stroke="url(#beam1)" 
+            stroke-width="36" 
+            stroke-linecap="round" />
+            
+      <path d="M -90 -90 L 90 90" 
+            stroke="url(#beam2)" 
+            stroke-width="36" 
+            stroke-linecap="round" 
+            opacity="0.9"/>
+
+      <path d="M 90 -110 L 90 110" 
+            stroke="url(#beam3)" 
+            stroke-width="36" 
+            stroke-linecap="round" />
+
+      <circle cx="-90" cy="-110" r="10" fill="white" />
+      <circle cx="90" cy="110" r="10" fill="white" />
+  </g>
+
+  <text x="256" y="440" class="logo-text" filter="url(#textGlow)">
+    NYX
+  </text>
+</svg>
