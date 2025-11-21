@@ -1,6 +1,5 @@
 import nacl from "tweetnacl";
 import util from "tweetnacl-util";
-import CryptoJS from "crypto-js";
 
 const wordList = [
   "abandon",
@@ -258,18 +257,34 @@ export function generateRecoveryPhrase(): string {
   return words.join(" ");
 }
 
-function phraseToSeed(phrase: string): Uint8Array {
-  const salt = "securechat_salt";
-  // SECURITY UPGRADE: Increased iterations from 1,000 to 100,000 to prevent brute-force attacks
-  const key = CryptoJS.PBKDF2(phrase, salt, {
-    keySize: 256 / 32,
-    iterations: 100000,
-  });
-  return fromHex(key.toString(CryptoJS.enc.Hex));
+async function phraseToSeed(phrase: string): Promise<Uint8Array> {
+  const enc = new TextEncoder();
+  const passwordKey = await window.crypto.subtle.importKey(
+    "raw",
+    enc.encode(phrase),
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits"]
+  );
+
+  const salt = enc.encode("Nyx_salt");
+
+  const keyBits = await window.crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 600000,
+      hash: "SHA-256",
+    },
+    passwordKey,
+    256
+  );
+
+  return new Uint8Array(keyBits);
 }
 
-export function generateKeysFromPhrase(phrase: string) {
-  const seed = phraseToSeed(phrase);
+export async function generateKeysFromPhrase(phrase: string) {
+  const seed = await phraseToSeed(phrase);
   const keyPair = nacl.box.keyPair.fromSecretKey(seed);
 
   return {
@@ -293,18 +308,15 @@ export function generateKeysFromHex(hexString: string) {
   }
 }
 
-export function getRawHexKey(phrase: string): string {
-  const seed = phraseToSeed(phrase);
-  return "0x" + toHex(seed);
-}
-
 function deriveId(seed: Uint8Array): string {
   const hash = nacl.hash(seed);
   return "05" + toHex(hash).substring(0, 22);
 }
 
-export function deriveSessionIdFromPhrase(phrase: string): string {
-  const seed = phraseToSeed(phrase);
+export async function deriveSessionIdFromPhrase(
+  phrase: string
+): Promise<string> {
+  const seed = await phraseToSeed(phrase);
   return deriveId(seed);
 }
 
